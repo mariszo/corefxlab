@@ -17,7 +17,7 @@ namespace System.Devices.Gpio
     /// </summary>
     #region GPIO - Basic Scenarios
 
-    public partial class GPIOPin
+    public partial class GPIOPin : IDisposable
     {
         int PinNumber { get { throw new NotImplementedException(); } }
         bool Read() { throw new NotImplementedException(); }
@@ -30,23 +30,24 @@ namespace System.Devices.Gpio
         int PWMValue { set { throw new NotImplementedException(); } }
     }
 
-    public partial class GPIOController
+    public partial class GPIOController : IDisposable
     {
+        GPIOPin this[int pinNumber] { get { throw new NotImplementedException(); } }
         GPIOPin OpenPin(int pinNumber) { throw new NotImplementedException(); }
         void ClosePin(int pinNumber) { throw new NotImplementedException(); }
         void ClosePin(GPIOPin pin) { throw new NotImplementedException(); }
         int PinCount() { throw new NotImplementedException(); }
         IEnumerable<GPIOPin> ConnectedPins { get { throw new NotImplementedException(); } }
+        void Dispose() { throw new NotImplementedException(); }
     }
 
-    enum GPIOPinMode
+    public enum GPIOPinMode
     {
-        Input,
-        Output,
-        PWM,
-        Pull_None,
         Pull_Down,
         Pull_Up,
+        PWM,
+        Input,
+        Output
     }
 
     #endregion
@@ -122,11 +123,63 @@ namespace System.Devices.Gpio
 
     #endregion
 
-    #region  SPI, I2C, Serial
+    /// <summary>
+    /// Stretch - Advanced Multi-Pin Connections
+    /// 
+    /// This section holds connection types where more than one pin is used to transmit data. There
+    /// are a ton of these, but the most commonly supported are SPI and I2C, followed by UART/SerialPort
+    /// </summary>
+    #region Stretch - Advanced Multi-Pin Connections
 
-    public partial class GPIOPin
+    public enum GPIOPinMode
     {
+        Pull_Down,
+        Pull_Up,
+        PWM,
+        Input,
+        Output,
+        SPI,
+        I2C,
+        UART, // serialport
+        Unknown
+    }
 
+    public partial class SpiConnection
+    {
+        // https://github.com/Petermarcu/Pi/tree/master/Pi.IO.SerialPeripheralInterface
+    }
+
+    public partial class I2cConnection
+    {
+        // https://github.com/Petermarcu/Pi/tree/master/Pi.IO.InterIntegratedCircuit
+    }
+
+    public class UARTConnection
+    {
+        // A Linux or platform-agnostic serial port library would likely have to be distinct from our 
+        // existing bloated Windows implementation. That wouldn't necessarily be a bad thing, though, as
+        // we could add basic functionality like read/write/open/close without the weight of the Windows
+        // implementation weighing it down.
+    }
+
+    /// <summary>
+    /// Out of Scope - More Advanced Connections
+    /// 
+    /// Though there are a bunch of useful connections types, we can't implement them all at once.
+    /// This section lists some more cool types that we should keep in the back of our mind though
+    /// and pursue after the above are complete.
+    /// </summary>
+    #region Out of Scope - More Advanced Connections
+
+    public class USBConnection
+    {
+        // We could include discovery of USB and even allow hot-swapping potentially. In addition to
+        // allowing easy communication over the port, of course.
+    }
+
+    public class BluetoothConnection
+    {
+        // Communicating with devices over bluetooth has been a highly requested feature for a while now. 
     }
 
     #endregion
