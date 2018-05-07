@@ -224,19 +224,19 @@ namespace System.Devices.Gpio
 - We should detail the pros and cons of using callbacks vs polling when implementing our eventing system
 - Compare performance of using basic File apis vs using MemoryMappedFiles
 
-# Week-by-Week Completion Plan
-	1. First-Round API review for all GPIO phases by first Friday. First check-in of an example usage or test case to corefxlab on Day1.
-    2. Basic functional tests written (TDD)
-    3. Basic GPIO Implementation in-progress
-    4. Basic GPIO Implementation finished and checked-in
-    5. Intermediate GPIO Implementation in-progress
-    6. Intermediate GPIO Implementation finished and checked-in
-    7. Advanced GPIO Implementation written and checked-in
-    8. BenchmarkDotNet performance tests written for 100% of Public APIs
-    9. Complete documentation for 100% of Public APIs, including usage examples
-    10. (Stretch) API Review for one of the multi-pin connection types
-    11. (Stretch) Tests, implementation, and documentation checked-in for multi-pin connection
-    12. (Stretch) Complete documentation for multi-pin connection and clean up any remaining work items
+# 12-Week Completion Plan
+1. First-Round API review for all GPIO phases by first Friday. First check-in of an example usage or test case to corefxlab on Day1.
+2. Basic functional tests written (TDD)
+3. Basic GPIO Implementation in-progress
+4. Basic GPIO Implementation finished, reviewed, documented, and checked-in
+5. Intermediate GPIO Implementation in-progress
+6. Intermediate GPIO Implementation finished, reviewed, documented, and checked-in
+7. Advanced GPIO Implementation in-progress
+8. Advanced GPIO Implementation written, reviewed, documented, and checked-in
+8. BenchmarkDotNet performance tests written for 100% of Public APIs
+9. (Stretch Goal) API Review for one of the multi-pin connection types
+1. (Stretch Goal) Multi-pin connection type implementation and tests in-progress
+8. (Stretch Goal) Multi-pin connection type Implementation completed, reviewed, documented, and checked-in. Clean up any remaining work items.
 
 # Documentation and Examples
 - Examples should be in a form that is easily recognizable for someone familiar with rpi developement, regardless of their current programming environment.
