@@ -6,7 +6,7 @@
 5. BenchmarkDotNet performance tests written for 100% of Public APIs
 6. Complete documentation for 100% of Public APIs, including usage examples
 
-# Research GPIO
+# Research
 - Understand the basic protocols and vocabulary
     - Analog vs Digital pin numbering
     - BCM vs Board numbering on a raspberry pi
@@ -27,7 +27,7 @@
     - [.NET Core on RPi](https://github.com/dotnet/core/blob/master/samples/RaspberryPiInstructions.md)
     - [PI.IO sample for reading barometric pressure, temperature, and more](https://github.com/Petermarcu/Pi/blob/master/IotSample/Program.cs)
     - [Sample program to use Alexa to control a Pi through Azure](https://github.com/Petermarcu/AlexaDotnetPi)
-- Consider specific scenarios in which GPIO would be used in .NET Core. Some exmaples:
+- Consider specific scenarios in which GPIO would be used in .NET Core. Some examples:
     - IoT Device Sends Data to Azure
 		- Example: A Raspberry Pi3 device collects sensor data (room temperature, soil temperature, soil moisture) and uploads it to Azure
 			- Azure IoT collects the data and turns the log data into graphs for an Azure hosted .NET Core Website (ASP.NET Core Razer page) and a Xamarin iOS/Android App
@@ -37,9 +37,9 @@
             - When the moisture level is low/high, it sends the device a control signal to turn on/off a water supply
 
 # API Design Requirements
-## Basic Scenarios
+### GPIO - Basic Implementation
 Most GPIO implementations share a core set of functionality to allow basic on/off control
-of pins. At the very least, we should support these.
+of pins. At the very least, we should support these:
 - Open a object that is a representation of a pin with the given pin number
 - Support closing a pin to release the resources owned by that pin object
 - Represent the mode of the pin that details how the pin handles reads and writes (e.g. Input, Output)
@@ -84,7 +84,7 @@ namespace System.Devices.Gpio
     }
 }
 ```
-## Advanced Scenarios
+### GPIO - Intermediate Implementation
 Beyond the basic set of functionality are a set of functions that are supported by *almost* every implementation out there. They are:
 - Analog Reads and Writes - Most GPIO works with digital pins, but sometimes analog pins are used. The difference in the 
     Analog pins is that they have a range of potential values instead of just being on/off like the digital pins.
@@ -115,18 +115,17 @@ namespace System.Devices.Gpio
 }
 ```
 
+### GPIO - Advanced Implementation
+Though not available everywhere, these functions provide high value to raspberry pi users and add some quality of life additions to everyone:
+- Choose between BCM or BOARD pin numbering
+- Waiters - Instead of manually polling a Read, a Waiter will handle the polling until the desired Read value is reached
+- Bit shifting - Add helpers to allow easily working with more usable data types
+- Advanced PWM functions can be added to allow setting range, rpi mode, etc.
+
+Stub API that builds on top of the previous API:
 ```
 namespace System.Devices.Gpio
 {
-    /// <summary>
-    /// GPIO - Bonuses
-    /// - Choose between BCM or BOARD pin numbering
-    /// - Waiters - Instead of manually polling a Read, a Waiter will handle the polling until the desired Read value is reached
-    /// - Bit shifting - Add helpers to allow easily working with more usable data types
-    /// - Advanced PWM functions can be added to allow setting range, rpi mode, etc.
-    /// </summary>
-    #region GPIO - Other Scenarios
-
     // BCM vs BOARD
     public partial class GPIOController
     {
@@ -161,17 +160,14 @@ namespace System.Devices.Gpio
 }
 ```
 
+### Stretch - Multi-Pin Connections
+This section holds connection types where more than one pin is used to transmit data. There are a quite a few of these, but the most commonly supported are SPI, I2C, and UART/SerialPort. It would be great if we could support at least one of these off-the-bat, but they aren't required to have a functional GPIO implementation.
+
+Stub API:
 ```
 namespace System.Devices.Gpio
 {
-    /// <summary>
-    /// Stretch - Advanced Multi-Pin Connections
-    /// 
-    /// This section holds connection types where more than one pin is used to transmit data. There
-    /// are a ton of these, but the most commonly supported are SPI and I2C, followed by UART/SerialPort
-    /// </summary>
-    #region Stretch - Advanced Multi-Pin Connections
-
+    // Add new members to the GPIOPinMode enum for the new pin types
     public enum GPIOPinMode
     {
         Pull_Down,
@@ -200,22 +196,16 @@ namespace System.Devices.Gpio
         // A Linux or platform-agnostic serial port library would likely have to be distinct from our 
         // existing bloated Windows implementation. That wouldn't necessarily be a bad thing, though, as
         // we could add basic functionality like read/write/open/close without the weight of the Windows
-        // implementation weighing it down.
+        // implementation
     }
 }
 ```
+
+### Out of Scope - Advanced Connection Types
+Though there are a bunch of useful connections types, we can't feasibly mplement them all at once. This section lists some more cool types that we should keep in the back of our mind and pursue after the above are complete.
 ```
 namespace System.Devices.Gpio
 {
-    /// <summary>
-    /// Out of Scope - More Advanced Connections
-    /// 
-    /// Though there are a bunch of useful connections types, we can't implement them all at once.
-    /// This section lists some more cool types that we should keep in the back of our mind though
-    /// and pursue after the above are complete.
-    /// </summary>
-    #region Out of Scope - More Advanced Connections
-
     public class USBConnection
     {
         // We could include discovery of USB and even allow hot-swapping potentially. In addition to
@@ -229,12 +219,16 @@ namespace System.Devices.Gpio
 }
 ```
 
-
+# Implementation Details
+- It is likely that the project will be linux only to start, though we should keep Windows in mind so we develop an API and behavior that will work cross-platform. If we can leverage the [WinRT API](https://docs.microsoft.com/en-us/uwp/api/windows.devices.gpio) then we should, either by recommending people use that on Windows or by building a Windows version of our API on top of it. If not, then we will need to investigate what win32 APIs are available to use.
+- We should detail the pros and cons of using callbacks vs polling when implementing our eventing system
+- Compare performance of using basic File apis vs using MemoryMappedFiles
 
 # Week-by-Week Completion Plan
 
 # Documentation and Examples
 - Examples should be in a form that is easily recognizable for someone familiar with rpi developement, regardless of their current programming environment.
+- Documentation could include a blog post with examples of some cool stuff you can do with GPIO
 
 # Contacts
 1. Edgardo Zoppi (summer intern)
