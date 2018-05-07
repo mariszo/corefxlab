@@ -1,8 +1,8 @@
 # Goals
 1. Research GPIO and gain a firm understanding of the practices and common use cases
 2. Plan out an API for a CoreFX implementation of basic GPIO methods and take it through API Review
-3. Complete a workable implementation of GPIO functionality
-4. Functional (positive, negative) tests for 100% of Public APIs
+3. Functional (positive, negative) tests for 100% of Public APIs
+4. Complete a workable implementation of GPIO functionality
 5. BenchmarkDotNet performance tests written for 100% of Public APIs
 6. Complete documentation for 100% of Public APIs, including usage examples
 
@@ -225,6 +225,18 @@ namespace System.Devices.Gpio
 - Compare performance of using basic File apis vs using MemoryMappedFiles
 
 # Week-by-Week Completion Plan
+	1. First-Round API review for all GPIO phases by first Friday. First check-in of an example usage or test case to corefxlab on Day1.
+    2. Basic functional tests written (TDD)
+    3. Basic GPIO Implementation in-progress
+    4. Basic GPIO Implementation finished and checked-in
+    5. Intermediate GPIO Implementation in-progress
+    6. Intermediate GPIO Implementation finished and checked-in
+    7. Advanced GPIO Implementation written and checked-in
+    8. BenchmarkDotNet performance tests written for 100% of Public APIs
+    9. Complete documentation for 100% of Public APIs, including usage examples
+    10. (Stretch) API Review for one of the multi-pin connection types
+    11. (Stretch) Tests, implementation, and documentation checked-in for multi-pin connection
+    12. (Stretch) Complete documentation for multi-pin connection and clean up any remaining work items
 
 # Documentation and Examples
 - Examples should be in a form that is easily recognizable for someone familiar with rpi developement, regardless of their current programming environment.
