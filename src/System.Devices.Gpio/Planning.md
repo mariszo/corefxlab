@@ -18,7 +18,7 @@
 		- UART (SerialPort)
 - Look at other notable GPIO implementations documentation
 	- [Windows.Devices.Gpio namespace (Windows IoT OS -only)](https://docs.microsoft.com/en-us/uwp/api/windows.devices.gpio)
-	- [PI.IO (Corefxdev team hackathon project](https://github.com/Petermarcu/Pi)
+	- [PI.IO (Corefxdev team hackathon project)](https://github.com/Petermarcu/Pi)
 	- [Wiring Pi (GPL)](http://wiringpi.com/)
 	- [RPI.GPIO (MIT)](http://tieske.github.io/rpi-gpio/modules/GPIO.html)
 
@@ -27,6 +27,7 @@
     - [.NET Core on RPi](https://github.com/dotnet/core/blob/master/samples/RaspberryPiInstructions.md)
     - [PI.IO sample for reading barometric pressure, temperature, and more](https://github.com/Petermarcu/Pi/blob/master/IotSample/Program.cs)
     - [Sample program to use Alexa to control a Pi through Azure](https://github.com/Petermarcu/AlexaDotnetPi)
+    - [Controlling a device through Azure IOT hub](https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-control-device-dotnet)
 - Consider specific scenarios in which GPIO would be used in .NET Core. Some examples:
     - IoT Device Sends Data to Azure
 		- Example: A Raspberry Pi3 device collects sensor data (room temperature, soil temperature, soil moisture) and uploads it to Azure
@@ -36,8 +37,7 @@
 			- When temperature is high/low, it sends the device a control signal to turn on/off a fan
             - When the moisture level is low/high, it sends the device a control signal to turn on/off a water supply
 
-# API Design Requirements
-### GPIO - Basic Implementation
+# GPIO - Basic Implementation
 Most GPIO implementations share a core set of functionality to allow basic on/off control
 of pins. At the very least, we should support these:
 - Open a object that is a representation of a pin with the given pin number
@@ -46,7 +46,7 @@ of pins. At the very least, we should support these:
 - Allow a resistor to be added to a pin such that it can be set as pullup or pulldown (or no pull)
 - Support setting a PWM value on a pin
 
-Here's a rough API shape that fulfills those requirements:
+### Rough API Shape
 ```
 namespace System.Devices.Gpio
 {
@@ -60,7 +60,7 @@ namespace System.Devices.Gpio
 
         GPIOPinMode PinMode { get { } set { } }
         bool IsPinModeSupported(GPIOPinMode pinMode) { }
-        int PWMValue { set { } }
+        int PWMValue { get { } set { } }
     }
 
     public partial class GPIOController : IDisposable
@@ -84,23 +84,23 @@ namespace System.Devices.Gpio
     }
 }
 ```
-### GPIO - Intermediate Implementation
+
+### Examples
+# GPIO - Intermediate Implementation
 Beyond the basic set of functionality are a set of functions that are supported by *almost* every implementation out there. They are:
-- Analog Reads and Writes - Most GPIO works with digital pins, but sometimes analog pins are used. The difference in the 
-    Analog pins is that they have a range of potential values instead of just being on/off like the digital pins.
-- Listeners - Polling, interrupts, etc. There should be some way to listen for a change and respond accordingly
-- Edge Detection - Used with listeners/eventing as a way of definining the circumstances under which an event/callback will be raised
+- Waiters - Instead of manually polling a Read, a Waiter will handle the polling until the desired Read value is reached
+- Listeners - There should be some way to listen for a change and respond accordingly using callbacks.
+- Edge Detection - Used with listeners/eventing as a way of defining the circumstances under which an event/callback will be raised
 - Allow setting a Debounce duration to ignore quickly occuring events during some timespan.
 
-Stub API that builds on top of the previous API:
+### Stub API that builds on top of the Basic API:
 ```
 namespace System.Devices.Gpio
 {
     public partial class GPIOPin
-    {
-        // Analog
-        int AnalogRead() { }
-        void AnalogWrite(int value) { }
+    {      
+        // Waiters
+        public bool ReadWait(TimeSpan timeout) { }
 
         // Listeners
         // TODO
@@ -115,24 +115,28 @@ namespace System.Devices.Gpio
 }
 ```
 
-### GPIO - Advanced Implementation
+### Examples
+
+
+# GPIO - Advanced Implementation
 Though not available everywhere, these functions provide high value to raspberry pi users and add some quality of life additions to everyone:
 - Choose between BCM or BOARD pin numbering
-- Waiters - Instead of manually polling a Read, a Waiter will handle the polling until the desired Read value is reached
 - Bit shifting - Add helpers to allow easily working with more usable data types
 - Advanced PWM functions can be added to allow setting range, rpi mode, etc.
-
-Stub API that builds on top of the previous API:
+- Analog Reads and Writes - Most GPIO works with digital pins, but sometimes analog pins are used. The difference in the 
+    Analog pins is that they have a range of potential values instead of just being on/off like the digital pins.
+    
+### Stub API that builds on top of the previous API:
 ```
 namespace System.Devices.Gpio
 {
     // BCM vs BOARD
     public partial class GPIOController
     {
-        GPIOController(GPIOScheme numbering = GPIOScheme.BOARD) { }
+        GPIOController(GPIOBoardMode numbering = GPIOBoardMode.BOARD) { }
     }
 
-    public enum GPIOScheme
+    public enum GPIOBoardMode
     {
         BOARD,
         BCM
@@ -140,8 +144,9 @@ namespace System.Devices.Gpio
 
     public partial class GPIOPin
     {
-        // Waiters
-        public bool ReadWait(TimeSpan timeout) { }
+        // Analog
+        int AnalogRead() { }
+        void AnalogWrite(int value) { }
         public int AnalogReadWait(TimeSpan timeout) { }
 
         // Bit-Shifts and writer helpers
@@ -150,6 +155,10 @@ namespace System.Devices.Gpio
         // Advanced PWM
         public int PWMRange { get { } }
         public PWMMode PWMMode { get { } }
+        
+        // Frequency and DutyCycle might be useful to add also to allow finer control of the PWM controller
+        // public int PWMFrequency { get { } set { } }
+        // public int PWMDutyCycle{ get { } set { } }
     }
 
     public enum PWMMode
@@ -160,10 +169,12 @@ namespace System.Devices.Gpio
 }
 ```
 
-### Stretch - Multi-Pin Connections
+### Examples
+
+# Stretch - Multi-Pin Connections
 This section holds connection types where more than one pin is used to transmit data. There are a quite a few of these, but the most commonly supported are SPI, I2C, and UART/SerialPort. It would be great if we could support at least one of these off-the-bat, but they aren't required to have a functional GPIO implementation.
 
-Stub API:
+### Stub API:
 ```
 namespace System.Devices.Gpio
 {
@@ -201,7 +212,7 @@ namespace System.Devices.Gpio
 }
 ```
 
-### Out of Scope - Advanced Connection Types
+# Out of Scope - Advanced Connection Types
 Though there are a bunch of useful connections types, we can't feasibly implement them all at once. This section lists some more types that we should keep in the back of our mind and pursue after the above are complete.
 ```
 namespace System.Devices.Gpio
@@ -221,8 +232,8 @@ namespace System.Devices.Gpio
 
 # Implementation Details
 - We should aim to have an answer for GPIO cross-platform, so we will need to design our API and behavior to be sensible across platforms. We should consider leveraging the [WinRT API](https://docs.microsoft.com/en-us/uwp/api/windows.devices.gpio), either by recommending people use that on Windows or by building a Windows version of our API on top of it. For the parts of our API not supported by WinRT, we will need to investigate what win32 APIs are available to use.
-- We should detail the pros and cons of using callbacks vs polling when implementing our eventing system
 - Compare performance of using basic File apis vs using MemoryMappedFiles
+- We can hit /dev/gpiomem without root access if we want to allow some functions to run non-root.
 
 # 12-Week Completion Plan
 1. First-Round API review for all GPIO phases by first Friday. First check-in of an example usage or test case to corefxlab on Day1.
