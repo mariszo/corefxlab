@@ -202,7 +202,7 @@ namespace System.Devices.Gpio
 ```
 
 ### Out of Scope - Advanced Connection Types
-Though there are a bunch of useful connections types, we can't feasibly mplement them all at once. This section lists some more cool types that we should keep in the back of our mind and pursue after the above are complete.
+Though there are a bunch of useful connections types, we can't feasibly implement them all at once. This section lists some more types that we should keep in the back of our mind and pursue after the above are complete.
 ```
 namespace System.Devices.Gpio
 {
@@ -220,7 +220,7 @@ namespace System.Devices.Gpio
 ```
 
 # Implementation Details
-- It is likely that the project will be linux only to start, though we should keep Windows in mind so we develop an API and behavior that will work cross-platform. If we can leverage the [WinRT API](https://docs.microsoft.com/en-us/uwp/api/windows.devices.gpio) then we should, either by recommending people use that on Windows or by building a Windows version of our API on top of it. If not, then we will need to investigate what win32 APIs are available to use.
+- We should aim to have an answer for GPIO cross-platform, so we will need to design our API and behavior to be sensible across platforms. We should consider leveraging the [WinRT API](https://docs.microsoft.com/en-us/uwp/api/windows.devices.gpio), either by recommending people use that on Windows or by building a Windows version of our API on top of it. For the parts of our API not supported by WinRT, we will need to investigate what win32 APIs are available to use.
 - We should detail the pros and cons of using callbacks vs polling when implementing our eventing system
 - Compare performance of using basic File apis vs using MemoryMappedFiles
 
@@ -240,7 +240,7 @@ namespace System.Devices.Gpio
 
 # Documentation and Examples
 - Examples should be in a form that is easily recognizable for someone familiar with rpi developement, regardless of their current programming environment.
-- Documentation could include a blog post with examples of some cool stuff you can do with GPIO
+- Documentation could include a blog post with examples of some cool stuff you can do with GPIO on .net core.
 
 # Contacts
 1. Edgardo Zoppi (summer intern)
